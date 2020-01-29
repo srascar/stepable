@@ -1,24 +1,26 @@
+interface TransitionEvent {
+  from: number;
+  to: number;
+  fromStep: HTMLElement;
+  toStep: HTMLElement;
+}
+
 interface Options {
   activeClass: string;
   initialStep: number;
   stepKey: string;
   stepSelector: string;
   triggerSelector: string;
+  prevTriggerSelector: string;
   shouldTransition: (
-    fromStep: HTMLElement,
-    toStep: HTMLElement,
+    transitionEvent: TransitionEvent,
     event: MouseEvent
   ) => boolean;
   beforeTransition: (
-    fromStep: HTMLElement,
-    toStep: HTMLElement,
+    transitionEvent: TransitionEvent,
     event: MouseEvent
   ) => any;
-  afterTransition: (
-    fromStep: HTMLElement,
-    toStep: HTMLElement,
-    event: MouseEvent
-  ) => any;
+  afterTransition: (transitionEvent: TransitionEvent, event: MouseEvent) => any;
 }
 
 const defaultOptions: Options = {
@@ -27,21 +29,22 @@ const defaultOptions: Options = {
   stepKey: "data-step",
   stepSelector: ".stepable",
   triggerSelector: ".stepable-trigger",
-  shouldTransition: (from, to) => true,
-  beforeTransition: (fromStep, toStep) => true,
-  afterTransition: (fromStep, toStep) => true
+  prevTriggerSelector: ".stepable-trigger--prev",
+  shouldTransition: (transitionEvent, event) => true,
+  beforeTransition: (transitionEvent, event) => true,
+  afterTransition: (transitionEvent, event) => true
 };
 
 export default class Stepable {
+  element: HTMLElement;
   currentIndex: number;
-  nextIndex: number;
   steps: HTMLElement[];
   options: Options;
 
   constructor(element: HTMLElement, options: Partial<Options> = {}) {
+    this.element = element;
     this.options = { ...defaultOptions, ...options };
     this.currentIndex = this.options.initialStep;
-    this.nextIndex = this.currentIndex + 1;
     this.steps = Array.from(
       element.querySelectorAll(this.options.stepSelector)
     );
@@ -64,29 +67,44 @@ export default class Stepable {
       return;
     }
 
-    if (this.options.shouldTransition(fromStep, toStep, event)) {
-      this.options.beforeTransition(fromStep, toStep, event);
+    const transitionEvent = {
+      from,
+      to,
+      fromStep,
+      toStep
+    };
+
+    if (this.options.shouldTransition(transitionEvent, event)) {
+      this.options.beforeTransition(transitionEvent, event);
       fromStep.classList.remove(`${this.options.activeClass}--true`);
       fromStep.classList.add(`${this.options.activeClass}--false`);
       this.currentIndex = to;
-      this.nextIndex = to + 1;
       toStep.classList.remove(`${this.options.activeClass}--false`);
       toStep.classList.add(`${this.options.activeClass}--true`);
-      this.options.afterTransition(fromStep, toStep, event);
+      this.options.afterTransition(transitionEvent, event);
     }
   }
 
   attachCallbacks() {
-    this.steps.forEach((step, i) => {
-      const triggers: HTMLElement[] = Array.from(
-        step.querySelectorAll(this.options.triggerSelector)
-      );
-      triggers.forEach(trigger => {
+    const triggers: HTMLElement[] = Array.from(
+      this.element.querySelectorAll(this.options.triggerSelector)
+    );
+    triggers.forEach(trigger => {
+      trigger.onclick = e => {
         const targetStep =
           trigger.dataset[this.options.stepKey.replace("data-", "")];
-        const to = targetStep ? Number(targetStep) : i + 1;
-        trigger.onclick = e => this.transitionToStep(this.currentIndex, to, e);
-      });
+        const to = targetStep ? Number(targetStep) : this.currentIndex + 1;
+        this.transitionToStep(this.currentIndex, to, e);
+      };
+    });
+
+    const prevTriggers: HTMLElement[] = Array.from(
+      this.element.querySelectorAll(this.options.prevTriggerSelector)
+    );
+    prevTriggers.forEach(trigger => {
+      trigger.onclick = e => {
+        this.transitionToStep(this.currentIndex, this.currentIndex - 1, e);
+      };
     });
   }
 }
