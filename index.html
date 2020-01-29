@@ -7,7 +7,7 @@
 
   <body>
     <div id="app">
-      <div class="stepable" data-step="0">
+      <div class="stepable stepable-active--true" data-step="0">
         <p>Step 1</p>
         <button class="stepable-trigger">Next</button>
         <button class="stepable-trigger--prev">Prev</button>
@@ -33,6 +33,12 @@
         <button class="stepable-trigger">Next</button>
         <button class="stepable-trigger--prev">Prev</button>
         <button class="stepable-trigger" data-step="0">Back to start</button>
+      </div>
+
+      <div>
+        <hr />
+        <button class="stepable-trigger">Outside Next</button>
+        <button class="stepable-trigger--prev">Outside Prev</button>
       </div>
     </div>
 
