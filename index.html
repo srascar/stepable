@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <title>Parcel Sandbox</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="src/style.css" />
+  </head>
+
+  <body>
+    <div id="app">
+      <div class="stepable" data-step="0">
+        <p>Step 1</p>
+        <button class="stepable-trigger">Next</button>
+      </div>
+      <div class="stepable" data-step="1">
+        <p>Step 2</p>
+        <button class="stepable-trigger">Next</button>
+        <button class="stepable-trigger" data-step="0">Prev</button>
+        <button class="stepable-trigger" data-step="3">Skip 4</button>
+      </div>
+      <div class="stepable" data-step="2">
+        <p>Step 3</p>
+        <button class="stepable-trigger">Next</button>
+        <button class="stepable-trigger" data-step="1">Prev</button>
+      </div>
+      <div class="stepable" data-step="3">
+        <p>Step 4</p>
+        <button class="stepable-trigger">Next</button>
+        <button class="stepable-trigger" data-step="2">Prev</button>
+      </div>
+      <div class="stepable" data-step="4">
+        <p>Step 5</p>
+        <button class="stepable-trigger">Next</button>
+        <button class="stepable-trigger" data-step="3">Prev</button>
+        <button class="stepable-trigger" data-step="0">Back to start</button>
+      </div>
+    </div>
+
+    <script src="src/index.ts"></script>
+  </body>
+</html>

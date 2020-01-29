@@ -1,0 +1,6 @@
+.stepable {
+  display: none;
+}
+.stepable.stepable-active--true {
+  display: block;
+}
